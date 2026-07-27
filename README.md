@@ -7,4 +7,3 @@ A Vendor Contract Management MCP built with NitroStack SDK, TypeScript, and Clic
 - Contract approval workflow
 - Event-based audit trail
 - Contract search and timeline
-- Renewal analytics
