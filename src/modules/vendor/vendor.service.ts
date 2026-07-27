@@ -62,6 +62,7 @@ export class VendorService {
             ...data,
         };
         await this.db.insert('vendors', [vendor]);
+        await this.insertEvent(vendor.vendor_id, vendor.vendor_id, 'VENDOR_REGISTERED', { name: vendor.name, category: vendor.category }, 'vendor');
         return vendor;
     }
 
