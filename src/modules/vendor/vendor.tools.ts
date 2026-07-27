@@ -1,5 +1,5 @@
 import { ToolDecorator as Tool, ExecutionContext, Injectable, z } from '@nitrostack/core';
-import { VendorService, ChatSession, SessionStep, SessionFlow } from './vendor.service.js';
+import { VendorService, SessionStep, SessionFlow } from './vendor.service.js';
 
 const RegisterVendorSchema = z.object({
     name: z.string().describe('Legal name of the vendor company'),
@@ -32,6 +32,11 @@ const UpdateContractSchema = z.object({
 
 const ContractIdSchema = z.object({
     contract_id: z.string().describe('ID of the contract'),
+});
+
+const GetMyContractsSchema = z.object({
+    vendor_id: z.string().describe('ID of the vendor to fetch contracts for'),
+    limit: z.number().positive().optional().default(20).describe('Maximum number of contracts to return'),
 });
 
 
@@ -128,6 +133,18 @@ export class VendorTools {
         return { success: true, contract };
     }
 
+    @Tool({
+        name: 'get_my_contracts',
+        description: 'Get all contracts associated with a specific vendor ID.',
+        inputSchema: GetMyContractsSchema,
+    })
+    async getMyContracts(input: z.infer<typeof GetMyContractsSchema>, ctx: ExecutionContext) {
+        const contracts = await this.vendorService.getMyContracts(input.vendor_id, input.limit);
+        ctx.logger.info('Fetched vendor contracts', { vendor_id: input.vendor_id, count: contracts.length });
+        return { success: true, contracts, count: contracts.length };
+    }
+    
+   
    
 
     //Chat Tools

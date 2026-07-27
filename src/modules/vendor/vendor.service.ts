@@ -111,6 +111,14 @@ export class VendorService {
         return rows[0] ?? null;
     }
 
+    async getMyContracts(vendor_id: string, limit = 20): Promise<Contract[]> {
+        const rows = await this.db.query<Contract>(
+            `SELECT * FROM contracts WHERE vendor_id = {vendor_id:String} ORDER BY created_at DESC LIMIT 1 BY contract_id LIMIT {limit:UInt32}`,
+            { vendor_id, limit }
+        );
+        return rows;
+    }
+
     async searchContracts(query: string, vendor_id?: string, limit = 20): Promise<Contract[]> {
         let sql = `SELECT * FROM contracts WHERE (title ILIKE {q:String} OR description ILIKE {q:String})`;
         const params: Record<string, unknown> = { q: `%${query}%`, limit };
@@ -118,7 +126,7 @@ export class VendorService {
             sql += ` AND vendor_id = {vendor_id:String}`;
             params.vendor_id = vendor_id;
         }
-        sql += ` ORDER BY created_at DESC LIMIT {limit:UInt32}`;
+        sql += ` ORDER BY created_at DESC LIMIT 1 BY contract_id LIMIT {limit:UInt32}`;
         return this.db.query<Contract>(sql, params);
     }
 
@@ -136,7 +144,6 @@ export class VendorService {
     }
 
 
-    // ─── Session Management ───────────────────────────────────────────────────
 
     async createSession(flow: SessionFlow, firstStep: SessionStep, contract_id?: string): Promise<ChatSession> {
         const session: ChatSession = {
@@ -158,7 +165,6 @@ export class VendorService {
     }
 
     async loadSession(session_id: string): Promise<ChatSession | null> {
-        // FINAL forces ClickHouse to collapse ReplacingMergeTree duplicates at query time
         const rows = await this.db.query<{
             session_id: string;
             flow: string;
@@ -194,8 +200,7 @@ export class VendorService {
     }
 
     async deleteSession(session_id: string): Promise<void> {
-        // ClickHouse MergeTree doesn't support row-level deletes natively;
-        // we mark it deleted by writing a tombstone with a sentinel flow value.
+       
         await this.db.insert('chat_sessions', [{
             session_id,
             flow: '__deleted__',
@@ -206,7 +211,6 @@ export class VendorService {
         }]);
     }
 
-    // ─── Internal ─────────────────────────────────────────────────────────────
 
     private async insertEvent(
         contract_id: string,

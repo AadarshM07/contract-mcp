@@ -25,7 +25,6 @@ export class ClickHouseService implements OnModuleInit, OnApplicationShutdown {
     }
 
     private async initSchema() {
-        // vendors table
         await this.client.exec({
             query: `
                 CREATE TABLE IF NOT EXISTS vendors (
@@ -43,7 +42,6 @@ export class ClickHouseService implements OnModuleInit, OnApplicationShutdown {
             `,
         });
 
-        // contracts table
         await this.client.exec({
             query: `
                 CREATE TABLE IF NOT EXISTS contracts (
@@ -62,7 +60,6 @@ export class ClickHouseService implements OnModuleInit, OnApplicationShutdown {
             `,
         });
 
-        // contract_events table — event-driven audit log
         await this.client.exec({
             query: `
                 CREATE TABLE IF NOT EXISTS contract_events (
@@ -79,7 +76,6 @@ export class ClickHouseService implements OnModuleInit, OnApplicationShutdown {
             `,
         });
 
-        // chat_sessions table — persisted guided-flow session state
         await this.client.exec({
             query: `
                 CREATE TABLE IF NOT EXISTS chat_sessions (

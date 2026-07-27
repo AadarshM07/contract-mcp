@@ -5,7 +5,7 @@ import { VendorTools } from './vendor.tools.js';
 
 @Module({
     name: 'VendorModule',
-    providers: [ClickHouseService, VendorService, VendorTools],
-    exports: [VendorService],
+    providers: [ClickHouseService, VendorService],
+    controllers: [VendorTools],
 })
 export class VendorModule {}
