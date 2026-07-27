@@ -1,4 +1,5 @@
 import { McpApp, Module, ConfigModule } from '@nitrostack/core';
+import {  AdminModule} from './modules/admin/admin.modules.js';
 import { VendorModule } from './modules/vendor/vendor.modules.js';
 
 @McpApp({
@@ -17,6 +18,7 @@ import { VendorModule } from './modules/vendor/vendor.modules.js';
     imports: [
         ConfigModule.forRoot(),
         VendorModule,
+        AdminModule,
     ],
 })
 export class AppModule {}
